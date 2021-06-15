@@ -13,19 +13,43 @@ class App extends React.Component{
       errMsg : '',
       displayErr: false,
       map : false,
+      weather: false,
+      weatherData : [],
+      searchQuery : ''
     }
+  }
+  UpdateSearchQuery = (event) => {
+    this.setState ({
+      searchQuery : event.target.value
+    })
+  }
+
+  getWeather = async() => {
+      try{
+         let weatherResult = await axios.get(`http://localhost:3010/weather?searchQuery=${this.state.searchQuery}`);
+         console.log(weatherResult.data);
+         this.setState({
+           weatherData : weatherResult.data,
+           weather : true
+         })
+      }
+      catch{
+        this.setState({
+          displayErr :true
+        })
+      }
   }
   
   getLocation = async(event) => {
     event.preventDefault()
-    let locquery = event.target.query.value
-    let locURL = `https://eu1.locationiq.com/v1/search.php?key=pk.c633e3c3415d57a3e6605607e0a87b4f&q=${locquery}&format=json`
+    let locURL = `https://eu1.locationiq.com/v1/search.php?key=pk.c633e3c3415d57a3e6605607e0a87b4f&q=${this.state.searchQuery}&format=json`
     try{
       let result = await axios.get(locURL);
       console.log(result.data);
       this.setState({
       locData: result.data[0],
       map: true,
+      weather :true,
     })
     }
     catch{
@@ -36,13 +60,14 @@ class App extends React.Component{
       })
 
     }
+    this.getWeather()
 }
   
   render(){
     return(
       <div>
         <form onSubmit={this.getLocation}>
-          <input type='text' placeholder='City Name' name='query' />
+          <input type='text' placeholder='City Name' name='query' onChange={this.UpdateSearchQuery}/>
           <input type='submit' value='search'/>
         </form>
         <p>{this.state.locData.display_name}</p>
@@ -50,9 +75,16 @@ class App extends React.Component{
         <p>{this.state.locData.lon}</p>
         {this.state.map && <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.c633e3c3415d57a3e6605607e0a87b4f&center=${this.state.locData.lat},${this.state.locData.lon}`} alt='map'/>}
         {this.state.displayErr && this.state.errMsg}
+        {this.state.weather && this.state.weatherData.map(item =>(
+          <div>
+            <p>date: {item.date}</p>
+            <p>description: {item.description}</p>
+          </div>
+    ))}
       </div>
     )
   }
+
 
 }
 
