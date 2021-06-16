@@ -14,8 +14,11 @@ class App extends React.Component{
       displayErr: false,
       map : false,
       weather: false,
+      movieShow: false,
       weatherData : [],
-      searchQuery : ''
+      searchQuery : '',
+      searchMovie : '',
+      movieData : [],
     }
   }
   UpdateSearchQuery = (event) => {
@@ -27,7 +30,6 @@ class App extends React.Component{
   getWeather = async() => {
       try{
          let weatherResult = await axios.get(`https://city-explorer-api33.herokuapp.com/weather?searchQuery=${this.state.searchQuery}`);
-         console.log(weatherResult.data);
          this.setState({
            weatherData : weatherResult.data,
            weather : true
@@ -38,6 +40,21 @@ class App extends React.Component{
           displayErr :true
         })
       }
+  }
+
+  getMovie = async() => {
+    try{
+      let movieResult = await axios.get(`https://city-explorer-api33.herokuapp.com/movie?moviename=${this.searchMovie}`)
+      console.log(result.data);
+      this.setState({
+        movieData : movieResult
+    })
+    }
+    catch{
+      this.setState({
+        displayErr :true
+      })
+    }
   }
   
   getLocation = async(event) => {
@@ -50,6 +67,7 @@ class App extends React.Component{
       locData: result.data[0],
       map: true,
       weather :true,
+      movieShow :true
     })
     }
     catch{
@@ -62,7 +80,7 @@ class App extends React.Component{
     }
     this.getWeather()
 }
-  
+
   render(){
     return(
       <div>
@@ -79,6 +97,17 @@ class App extends React.Component{
           <div>
             <p>date: {item.date}</p>
             <p>description: {item.description}</p>
+          </div>
+    ))}
+        {this.state.movieShow && this.state.movieData.map(item =>(
+          <div>
+            <p>Title {item.title}</p>
+            <p>Overview: {item.overview}</p>
+            <p>Average Vote: {item.average_votes}</p>
+            <p>Total Votes: {item.total_votes}</p>
+            <p>Popularity: {item.popularity}</p>
+            <p>Released on: {item.release_on}</p>
+            <img src={this.image_url}/>
           </div>
     ))}
       </div>
