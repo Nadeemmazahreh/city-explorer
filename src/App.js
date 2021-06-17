@@ -23,31 +23,32 @@ class App extends React.Component{
   }
   UpdateSearchQuery = (event) => {
     this.setState ({
-      searchQuery : event.target.value
+      searchQuery : event.target.value,
+      searchMovie : event.target.value
     })
   }
 
-  getWeather = async() => {
-      try{
-         let weatherResult = await axios.get(`https://city-explorer-api33.herokuapp.com/weather?searchQuery=${this.state.searchQuery}`);
-         this.setState({
-           weatherData : weatherResult.data,
-           weather : true
-         })
-      }
-      catch{
-        this.setState({
-          displayErr :true
-        })
-      }
-  }
+  // getWeather = async() => {
+  //     try{
+  //        let weatherResult = await axios.get(`https://city-explorer-api33.herokuapp.com/weather?searchQuery=${this.state.searchQuery}`);
+  //        this.setState({
+  //          weatherData : weatherResult.data,
+  //          weather : true
+  //        })
+  //     }
+  //     catch{
+  //       this.setState({
+  //         displayErr :true
+  //       })
+  //     }
+  // }
 
   getMovie = async() => {
     try{
-      let movieResult = await axios.get(`https://city-explorer-api33.herokuapp.com/movie?moviename=${this.searchMovie}`)
+      let movieResult = await axios.get(`https://city-explorer-api33.herokuapp.com/movie?moviename=${this.state.searchMovie}`)
       console.log(result.data);
       this.setState({
-        movieData : movieResult
+        movieData : movieResult.data
     })
     }
     catch{
@@ -78,7 +79,8 @@ class App extends React.Component{
       })
 
     }
-    this.getWeather()
+    // this.getWeather()
+    this.getMovie()
 }
 
   render(){
@@ -93,21 +95,21 @@ class App extends React.Component{
         <p>{this.state.locData.lon}</p>
         {this.state.map && <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.c633e3c3415d57a3e6605607e0a87b4f&center=${this.state.locData.lat},${this.state.locData.lon}`} alt='map'/>}
         {this.state.displayErr && this.state.errMsg}
-        {this.state.weather && this.state.weatherData.map(item =>(
+        {/* {this.state.weather && this.state.weatherData.map(item =>(
           <div>
             <p>date: {item.date}</p>
             <p>description: {item.description}</p>
           </div>
-    ))}
+    ))} */}
         {this.state.movieShow && this.state.movieData.map(item =>(
           <div>
-            <p>Title {item.title}</p>
+            <p>Title: {item.title}</p>
             <p>Overview: {item.overview}</p>
             <p>Average Vote: {item.average_votes}</p>
             <p>Total Votes: {item.total_votes}</p>
             <p>Popularity: {item.popularity}</p>
-            <p>Released on: {item.release_on}</p>
-            <img src={this.image_url}/>
+            <p>Released on: {item.released_on}</p>
+            <img src={item.image_url}/>
           </div>
     ))}
       </div>
